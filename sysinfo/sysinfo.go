@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/net"
 	"github.com/shirou/gopsutil/v3/mem"
 )
@@ -40,4 +41,20 @@ func GetNetInfo() ([]net.InterfaceStat, error) {
 	}
 
 	return netInfo, nil
+}
+
+func GetCPUInfo() ([]cpu.InfoStat, error) {
+
+	cpuInfo, err := cpu.Info()
+	//1. If error encountered while fetching cpu indo
+	if err != nil {
+		return nil, fmt.Errorf("[mem.VirtualMemory() Error] %v", err.Error())
+	}
+	//2, If valid json format
+	_, errMarshal := json.Marshal(cpuInfo)
+	if errMarshal != nil {
+		return nil, fmt.Errorf("[json.Marshal Error] %v", errMarshal.Error())
+	}
+
+	return cpuInfo, nil
 }

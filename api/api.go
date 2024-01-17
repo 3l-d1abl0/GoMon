@@ -14,7 +14,7 @@ func Setup() {
 	//Router setup
 	router := gin.Default()
 
-	//Get memory Info
+	//GET memory Info
 	router.GET("/api/v1/resource/memory", func(c *gin.Context) {
 
 		memInfo, err := sysinfo.GetMemInfo()
@@ -26,6 +26,7 @@ func Setup() {
 
 	})
 
+	//GET network Info
 	router.GET("/api/v1/resource/network", func(c *gin.Context) {
 
 		netInfo, err := sysinfo.GetNetInfo()
@@ -33,6 +34,17 @@ func Setup() {
 			c.JSON(http.StatusInternalServerError, err.Error())
 		}
 		c.JSON(200, gin.H{"networkInfo": netInfo})
+
+	})
+
+	//GET CPU info
+	router.GET("api/v1/resource/cpu", func(c *gin.Context) {
+
+		cpuInfo, err := sysinfo.GetCPUInfo()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+		}
+		c.JSON(200, gin.H{"cpuInfo": cpuInfo})
 
 	})
 
