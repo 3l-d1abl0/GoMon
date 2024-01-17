@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -114,6 +115,35 @@ func Setup() {
 			"cpuInfo":     cpuInfo,
 			"hostInfo":    hostInfo,
 			"loadInfo":    loadInfo})
+
+	})
+
+	//GET all routes
+	router.GET("/api/v1", func(c *gin.Context) {
+
+		type Routes struct {
+			Method string `json:"method"`
+			Path   string `json:"path"`
+		}
+
+		var routesInfo []Routes
+		for _, item := range router.Routes() {
+			routesInfo = append(routesInfo, Routes{Method: item.Method, Path: item.Path})
+		}
+
+		routesInfoJson, errMarshal := json.MarshalIndent(routesInfo, "", "  ")
+		if errMarshal != nil {
+			c.JSON(http.StatusInternalServerError, "Error Processing routes")
+		}
+
+		//routesInfoJson - bytes
+		c.JSON(200, gin.H{"apiRoutes": string(routesInfoJson)})
+	})
+
+	//REDIRECT to /api/v1
+	router.GET("/", func(c *gin.Context) {
+
+		c.Redirect(http.StatusMovedPermanently, "/api/v1")
 
 	})
 
