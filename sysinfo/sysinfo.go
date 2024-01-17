@@ -6,6 +6,7 @@ import (
 
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/host"
+	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/net"
 	"github.com/shirou/gopsutil/v3/mem"
 )
@@ -75,4 +76,21 @@ func GetHostInfo() (*host.InfoStat, error) {
 	}
 
 	return hostInfo, nil
+}
+
+func GetLoadInfo() (*load.AvgStat, error) {
+
+	loadInfo, err := load.Avg()
+	//1. If errpr occured while fetching load Info
+	if err != nil {
+		return nil, fmt.Errorf("[load.Avg() Error] %v", err.Error())
+	}
+
+	//2. If valid json format
+	_, errMarshal := json.Marshal(loadInfo)
+	if err != nil {
+		return nil, fmt.Errorf("[json.Marshal Error] %v", errMarshal.Error())
+	}
+
+	return loadInfo, nil
 }

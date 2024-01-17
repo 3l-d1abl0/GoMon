@@ -59,6 +59,15 @@ func Setup() {
 
 	})
 
+	router.GET("/api/v1/resource/load", func(c *gin.Context) {
+
+		loadInfo, err := sysinfo.GetLoadInfo()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+		}
+		c.JSON(200, gin.H{"loadInfo": loadInfo})
+	})
+
 	log.Fatal(router.Run(":3000"))
 
 }
