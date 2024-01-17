@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/net"
 	"github.com/shirou/gopsutil/v3/mem"
 )
@@ -48,13 +49,30 @@ func GetCPUInfo() ([]cpu.InfoStat, error) {
 	cpuInfo, err := cpu.Info()
 	//1. If error encountered while fetching cpu indo
 	if err != nil {
-		return nil, fmt.Errorf("[mem.VirtualMemory() Error] %v", err.Error())
+		return nil, fmt.Errorf("[cpu.Info() Error] %v", err.Error())
 	}
-	//2, If valid json format
+	//2. If valid json format
 	_, errMarshal := json.Marshal(cpuInfo)
 	if errMarshal != nil {
 		return nil, fmt.Errorf("[json.Marshal Error] %v", errMarshal.Error())
 	}
 
 	return cpuInfo, nil
+}
+
+func GetHostInfo() (*host.InfoStat, error) {
+
+	hostInfo, err := host.Info()
+	//1. If errpr occured while fetching host Info
+	if err != nil {
+		return nil, fmt.Errorf("[host.Info() Error] %v", err.Error())
+	}
+
+	//2. If valid json format
+	_, errMarshal := json.Marshal(hostInfo)
+	if err != nil {
+		return nil, fmt.Errorf("[json.Marshal Error] %v", errMarshal.Error())
+	}
+
+	return hostInfo, nil
 }

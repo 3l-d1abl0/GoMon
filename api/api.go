@@ -48,5 +48,17 @@ func Setup() {
 
 	})
 
+	//GET host Info
+	router.GET("/api/v1/resource/host", func(c *gin.Context) {
+
+		hostInfo, err := sysinfo.GetHostInfo()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+		}
+		c.JSON(200, gin.H{"hostInfo": hostInfo})
+
+	})
+
 	log.Fatal(router.Run(":3000"))
+
 }
