@@ -59,6 +59,7 @@ func Setup() {
 
 	})
 
+	//GET System load
 	router.GET("/api/v1/resource/load", func(c *gin.Context) {
 
 		loadInfo, err := sysinfo.GetLoadInfo()
@@ -66,6 +67,54 @@ func Setup() {
 			c.JSON(http.StatusInternalServerError, err.Error())
 		}
 		c.JSON(200, gin.H{"loadInfo": loadInfo})
+	})
+
+	//GET All resources
+	router.GET("/api/v1/resource/all", func(c *gin.Context) {
+
+		c.Redirect(http.StatusMovedPermanently, "/api/v1/resource/")
+
+	})
+
+	router.GET("/api/v1/resource/", func(c *gin.Context) {
+
+		//1. Memory info
+		memInfo, err := sysinfo.GetMemInfo()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		//2. Network Info
+		netInfo, err := sysinfo.GetNetInfo()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		//3. Cpu Info
+		cpuInfo, err := sysinfo.GetCPUInfo()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		//4. host Info
+		hostInfo, err := sysinfo.GetHostInfo()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		//5. loadInfo
+		loadInfo, err := sysinfo.GetLoadInfo()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		//Combine All
+		c.JSON(200, gin.H{"memoryInfo": memInfo,
+			"networkInfo": netInfo,
+			"cpuInfo":     cpuInfo,
+			"hostInfo":    hostInfo,
+			"loadInfo":    loadInfo})
+
 	})
 
 	log.Fatal(router.Run(":3000"))
