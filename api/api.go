@@ -2,18 +2,33 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
 	"GoMon/sysinfo"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shirou/gopsutil/host"
 )
+
+func addHeaders() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		hostInfo, _ := host.Info()
+		c.Writer.Header().Set("Hostname", fmt.Sprintf("%v", hostInfo.Hostname))
+		c.Writer.Header().Set("Hostid", fmt.Sprintf("%v", hostInfo.HostID))
+		c.Next()
+	}
+}
 
 func Setup() {
 
 	//Router setup
 	router := gin.Default()
+
+	//custom middleware
+	router.Use(addHeaders())
 
 	//GET memory Info
 	router.GET("/api/v1/resource/memory", func(c *gin.Context) {
