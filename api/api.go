@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"GoMon/sysinfo"
@@ -22,7 +21,7 @@ func addHeaders() gin.HandlerFunc {
 	}
 }
 
-func Setup() {
+func Setup() *gin.Engine {
 
 	//Router setup
 	router := gin.Default()
@@ -162,6 +161,6 @@ func Setup() {
 
 	})
 
-	log.Fatal(router.Run(":3000"))
+	return router
 
 }
