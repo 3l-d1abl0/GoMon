@@ -1,7 +1,8 @@
 package main
 
 import (
-	"GoMon/api"
+	route "GoMon/api"
+	"GoMon/middlewares"
 	"context"
 	"fmt"
 	"net/http"
@@ -12,24 +13,47 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 )
+
+var logFile *os.File
+var logger = logrus.New()
 
 func init() {
 
+	logFile, err := os.OpenFile("GoMon.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		logger.Fatal("Error handling log File: ", err)
+	}
+
+	logger.SetOutput(logFile)
+	logger.SetFormatter(&logrus.JSONFormatter{})
+
 	// Log error if .env file does not exist
 	if err := godotenv.Load("envs/.env"); err != nil {
-		fmt.Println("No .env file found")
-		panic("No .env file found")
+		logger.Fatal("No .env file found")
 	}
 
 	//Set mode in init function
 	gin.SetMode(os.Getenv("GIN_MODE"))
+
 }
 func main() {
 
-	//Get the router
-	var app *gin.Engine = api.Setup()
+	defer logFile.Close()
 
+	//Gin setup
+	app := gin.Default()
+
+	//custom middleware
+	app.Use(middlewares.AddHeaders())
+	// Use a custom middleware to log to the file using Logrus
+	app.Use(middlewares.LoggerWithLogrus(logger))
+
+	//Get the router
+	route.Setup(app, logger)
+
+	//hppt server Config
 	server := &http.Server{
 		Addr:    ":" + os.Getenv("SERVERPORT"),
 		Handler: app,
@@ -48,11 +72,9 @@ func main() {
 		fmt.Printf("Starting Server on : %s\n", os.Getenv("SERVERPORT"))
 		if err := server.ListenAndServe(); err != nil {
 			if err == http.ErrServerClosed {
-				fmt.Printf("Server closed under request : %s\n", err)
-				//panic(fmt.Sprintf("Server closed under request : %s\n", err))
+				logger.Error("Server closed under request : ", err)
 			} else {
-				fmt.Printf("Server closed unexpect : %s\n", err)
-				//panic(fmt.Sprintf("Server closed unexpect : %s\n", err))
+				logger.Error("Server closed unexpect  : ", err)
 			}
 		}
 
@@ -60,7 +82,7 @@ func main() {
 
 	// Wait for interrupt signal to gracefully shutdown the server
 	<-quit
-	fmt.Println("Trying to Shutdown Server !")
+	logger.Warn("Trying to Shutdown Server !")
 
 	//Context with a timeout of 5 seconds.
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -68,15 +90,15 @@ func main() {
 
 	//Server shutdown
 	if err := server.Shutdown(ctx); err != nil {
-		fmt.Printf("Error while Server Shutdown: %s\n", err)
+		logger.Errorf("Error while Server Shutdown: %s\n", err)
 	}
 
 	// catching ctx.Done(). timeout of 5 seconds.
 	select {
 	case <-ctx.Done():
-		fmt.Println("Timeout :5 sec")
+		logger.Info("Timeout :5 sec")
 	}
 
-	fmt.Println("Exiting Server !")
+	logger.Info("Exiting Server !")
 
 }

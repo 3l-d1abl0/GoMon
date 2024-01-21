@@ -2,38 +2,22 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"GoMon/sysinfo"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shirou/gopsutil/host"
+	"github.com/sirupsen/logrus"
 )
 
-func addHeaders() gin.HandlerFunc {
-	return func(c *gin.Context) {
-
-		hostInfo, _ := host.Info()
-		c.Writer.Header().Set("Hostname", fmt.Sprintf("%v", hostInfo.Hostname))
-		c.Writer.Header().Set("Hostid", fmt.Sprintf("%v", hostInfo.HostID))
-		c.Next()
-	}
-}
-
-func Setup() *gin.Engine {
-
-	//Router setup
-	router := gin.Default()
-
-	//custom middleware
-	router.Use(addHeaders())
+func Setup(router *gin.Engine, logger *logrus.Logger) {
 
 	//GET memory Info
 	router.GET("/api/v1/resource/memory", func(c *gin.Context) {
 
 		memInfo, err := sysinfo.GetMemInfo()
 		if err != nil {
+			logger.Error("Path: ", c.Request.URL.Path, "Error: ", err.Error())
 			c.JSON(http.StatusInternalServerError, err.Error())
 		}
 		//fmt.Println("Total memory: ", strconv.FormatUint(memInfo.Total/(1024*1024), 10)+" MB")
@@ -46,6 +30,7 @@ func Setup() *gin.Engine {
 
 		netInfo, err := sysinfo.GetNetInfo()
 		if err != nil {
+			logger.Error("Path: ", c.Request.URL.Path, "Error: ", err.Error())
 			c.JSON(http.StatusInternalServerError, err.Error())
 		}
 		c.JSON(200, gin.H{"networkInfo": netInfo})
@@ -57,6 +42,7 @@ func Setup() *gin.Engine {
 
 		cpuInfo, err := sysinfo.GetCPUInfo()
 		if err != nil {
+			logger.Error("Path: ", c.Request.URL.Path, "Error: ", err.Error())
 			c.JSON(http.StatusInternalServerError, err.Error())
 		}
 		c.JSON(200, gin.H{"cpuInfo": cpuInfo})
@@ -68,6 +54,7 @@ func Setup() *gin.Engine {
 
 		hostInfo, err := sysinfo.GetHostInfo()
 		if err != nil {
+			logger.Error("Path: ", c.Request.URL.Path, "Error: ", err.Error())
 			c.JSON(http.StatusInternalServerError, err.Error())
 		}
 		c.JSON(200, gin.H{"hostInfo": hostInfo})
@@ -79,6 +66,7 @@ func Setup() *gin.Engine {
 
 		loadInfo, err := sysinfo.GetLoadInfo()
 		if err != nil {
+			logger.Error("Path: ", c.Request.URL.Path, "Error: ", err.Error())
 			c.JSON(http.StatusInternalServerError, err.Error())
 		}
 		c.JSON(200, gin.H{"loadInfo": loadInfo})
@@ -96,30 +84,35 @@ func Setup() *gin.Engine {
 		//1. Memory info
 		memInfo, err := sysinfo.GetMemInfo()
 		if err != nil {
+			logger.Error("Path: ", c.Request.URL.Path, "Error: ", err.Error())
 			c.JSON(http.StatusInternalServerError, err.Error())
 		}
 
 		//2. Network Info
 		netInfo, err := sysinfo.GetNetInfo()
 		if err != nil {
+			logger.Error("Path: ", c.Request.URL.Path, "Error: ", err.Error())
 			c.JSON(http.StatusInternalServerError, err.Error())
 		}
 
 		//3. Cpu Info
 		cpuInfo, err := sysinfo.GetCPUInfo()
 		if err != nil {
+			logger.Error("Path: ", c.Request.URL.Path, "Error: ", err.Error())
 			c.JSON(http.StatusInternalServerError, err.Error())
 		}
 
 		//4. host Info
 		hostInfo, err := sysinfo.GetHostInfo()
 		if err != nil {
+			logger.Error("Path: ", c.Request.URL.Path, "Error: ", err.Error())
 			c.JSON(http.StatusInternalServerError, err.Error())
 		}
 
 		//5. loadInfo
 		loadInfo, err := sysinfo.GetLoadInfo()
 		if err != nil {
+			logger.Error("Path: ", c.Request.URL.Path, "Error: ", err.Error())
 			c.JSON(http.StatusInternalServerError, err.Error())
 		}
 
@@ -147,6 +140,7 @@ func Setup() *gin.Engine {
 
 		routesInfoJson, errMarshal := json.MarshalIndent(routesInfo, "", "  ")
 		if errMarshal != nil {
+			logger.Error("Path: ", c.Request.URL.Path, "Error: ", errMarshal.Error())
 			c.JSON(http.StatusInternalServerError, "Error Processing routes")
 		}
 
@@ -160,7 +154,5 @@ func Setup() *gin.Engine {
 		c.Redirect(http.StatusMovedPermanently, "/api/v1")
 
 	})
-
-	return router
 
 }
