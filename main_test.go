@@ -36,10 +36,6 @@ func TestHomepage(t *testing.T) {
 	assert.Equal(t, 301, w.Code)
 }
 
-func isJSON(s string) bool {
-	var js interface{}
-	return json.Unmarshal([]byte(s), &js) == nil
-}
 func TestApiV1Home(t *testing.T) {
 
 	r := SetUpRouter()
@@ -64,6 +60,42 @@ func TestApiV1Home(t *testing.T) {
 
 	var apiRoutesData APIRoutes
 	if err := json.Unmarshal([]byte(string(responseData)), &apiRoutesData); err != nil {
+		t.Errorf("Error decoding JSON: %s", err)
+	}
+}
+
+func TestRouteMemory(t *testing.T) {
+
+	r := SetUpRouter()
+	req, _ := http.NewRequest("GET", "/api/v1/resource/memory", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	responseData, _ := io.ReadAll(w.Body)
+
+	//assert.Equal(t, mockResponse, string(responseData))
+	//1. Test for 200
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	type MemoryInfo struct {
+		Total       uint64  `json:"total"`
+		Available   uint64  `json:"available"`
+		Used        uint64  `json:"used"`
+		UsedPercent float64 `json:"usedPercent"`
+		Free        uint64  `json:"free"`
+		Active      uint64  `json:"active"`
+		Inactive    uint64  `json:"inactive"`
+		SwapTotal   uint64  `json:"swapTotal"`
+		SwapFree    uint64  `json:"swapFree"`
+	}
+
+	type MemoryInfoResponse struct {
+		MemoryInfo MemoryInfo `json:"memoryInfo"`
+	}
+
+	var memoryInfoContainer MemoryInfoResponse
+	err := json.Unmarshal([]byte(responseData), &memoryInfoContainer)
+	if err != nil {
 		t.Errorf("Error decoding JSON: %s", err)
 	}
 }
