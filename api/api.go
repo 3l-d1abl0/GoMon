@@ -145,9 +145,7 @@ func Setup(router *gin.Engine, logger *logrus.Logger) {
 		}
 
 		//routesInfoJson - bytes
-		c.JSON(200, gin.H{"apiRoutes": string(routesInfoJson)})
-
-		//c.JSON(200, gin.H{"apiRoutes": json.RawMessage(string(routesInfoJson))})
+		c.JSON(200, gin.H{"apiRoutes": json.RawMessage(string(routesInfoJson))})
 	})
 
 	//REDIRECT to /api/v1
