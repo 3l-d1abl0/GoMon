@@ -2,6 +2,7 @@ package main
 
 import (
 	route "GoMon/api"
+	commondata "GoMon/commonData"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -97,5 +98,25 @@ func TestRouteMemory(t *testing.T) {
 	err := json.Unmarshal([]byte(responseData), &memoryInfoContainer)
 	if err != nil {
 		t.Errorf("Error decoding JSON: %s", err)
+	}
+}
+
+func TestRouteNetwork(t *testing.T) {
+
+	r := SetUpRouter()
+	req, _ := http.NewRequest("GET", "/api/v1/resource/network", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	responseData, _ := io.ReadAll(w.Body)
+
+	//1. Test for 200
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var networkInfo commondata.NetworkInfo
+
+	err := json.Unmarshal([]byte(responseData), &networkInfo)
+	if err != nil {
+		t.Errorf("Error decoding networkInfo JSON: %s", err)
 	}
 }

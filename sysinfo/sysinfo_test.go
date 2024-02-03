@@ -1,6 +1,7 @@
 package sysinfo
 
 import (
+	commondata "GoMon/commonData"
 	"encoding/json"
 	"fmt"
 	"testing"
@@ -36,4 +37,26 @@ func TestGetMemInfo(t *testing.T) {
 	if marshallErr != nil {
 		t.Errorf("Error decoding JSON: %s", marshallErr)
 	}
+}
+
+func TestGetNetinfo(t *testing.T) {
+
+	netInfo, err := GetNetInfo()
+
+	if err != nil {
+		t.Errorf("Error fetching Network Info: %s", err)
+	}
+
+	//var networkInfo commondata.NetworkInfo
+	var networkInterfaces []commondata.NetworkInterface
+
+	jsonData, marshallErr := json.MarshalIndent(netInfo, "", "  ")
+	if marshallErr != nil {
+		t.Errorf("Error marshalling NetworkInfo data: %s", marshallErr)
+	}
+	marshallErr = json.Unmarshal([]byte(string(jsonData)), &networkInterfaces)
+	if marshallErr != nil {
+		t.Errorf("Error decoding networkInfo JSON: %s", marshallErr)
+	}
+
 }
