@@ -138,14 +138,14 @@ func Setup(router *gin.Engine, logger *logrus.Logger) {
 			routesInfo = append(routesInfo, Routes{Method: item.Method, Path: item.Path})
 		}
 
-		routesInfoJson, errMarshal := json.MarshalIndent(routesInfo, "", "  ")
+		routesInfoJson, errMarshal := json.Marshal(routesInfo)
 		if errMarshal != nil {
 			logger.Error("Path: ", c.Request.URL.Path, "Error: ", errMarshal.Error())
 			c.JSON(http.StatusInternalServerError, "Error Processing routes")
 		}
 
 		//routesInfoJson - bytes
-		c.JSON(200, gin.H{"apiRoutes": string(routesInfoJson)})
+		c.JSON(200, gin.H{"apiRoutes": json.RawMessage(string(routesInfoJson))})
 	})
 
 	//REDIRECT to /api/v1
