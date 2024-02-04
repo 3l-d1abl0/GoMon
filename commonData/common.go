@@ -36,3 +36,23 @@ type CPUInfo struct {
 type CPUInfoList struct {
 	CPUInfoList []CPUInfo `json:"cpuInfo"`
 }
+
+type HostInfo struct {
+	Hostname             string `json:"hostname"`
+	Uptime               int    `json:"uptime"`
+	BootTime             int    `json:"bootTime"`
+	Procs                int    `json:"procs"`
+	OS                   string `json:"os"`
+	Platform             string `json:"platform"`
+	PlatformFamily       string `json:"platformFamily"`
+	PlatformVersion      string `json:"platformVersion"`
+	KernelVersion        string `json:"kernelVersion"`
+	KernelArch           string `json:"kernelArch"`
+	VirtualizationSystem string `json:"virtualizationSystem"`
+	VirtualizationRole   string `json:"virtualizationRole"`
+	HostID               string `json:"hostid"`
+}
+
+type HostData struct {
+	HostInfo HostInfo `json:"hostInfo"`
+}
