@@ -47,7 +47,6 @@ func TestGetNetinfo(t *testing.T) {
 		t.Errorf("Error fetching Network Info: %s", err)
 	}
 
-	//var networkInfo commondata.NetworkInfo
 	var networkInterfaces []commondata.NetworkInterface
 
 	jsonData, marshallErr := json.MarshalIndent(netInfo, "", "  ")
@@ -59,4 +58,26 @@ func TestGetNetinfo(t *testing.T) {
 		t.Errorf("Error decoding networkInfo JSON: %s", marshallErr)
 	}
 
+}
+
+func TestGetCpuInfo(t *testing.T) {
+
+	cpuInfo, err := GetCPUInfo()
+
+	if err != nil {
+		t.Errorf("Error fetching CPU Info: %s", err)
+	}
+
+	//Convert cpu.InfoStat to Json
+	jsonData, marshallErr := json.MarshalIndent(cpuInfo, "", "  ")
+	if marshallErr != nil {
+		t.Errorf("Error marshalling CpuInfo data: %s", marshallErr)
+	}
+
+	var cpuInfoList []commondata.CPUInfo
+	//Check fo valid JSON Structure
+	marshallErr = json.Unmarshal([]byte(string(jsonData)), &cpuInfoList)
+	if marshallErr != nil {
+		t.Errorf("Error decoding cpu.InfoStat JSON: %s", marshallErr)
+	}
 }

@@ -120,3 +120,23 @@ func TestRouteNetwork(t *testing.T) {
 		t.Errorf("Error decoding networkInfo JSON: %s", err)
 	}
 }
+
+func TestRouteCpu(t *testing.T) {
+
+	r := SetUpRouter()
+	req, _ := http.NewRequest("GET", "/api/v1/resource/cpu", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	responseData, _ := io.ReadAll(w.Body)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var cpuList commondata.CPUInfoList
+
+	err := json.Unmarshal([]byte(responseData), &cpuList)
+	if err != nil {
+		t.Errorf("Error decoding cpuInfo JSON: %s", err)
+	}
+
+}
