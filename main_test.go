@@ -140,3 +140,23 @@ func TestRouteCpu(t *testing.T) {
 	}
 
 }
+
+func TestRouteHost(t *testing.T) {
+
+	r := SetUpRouter()
+	req, _ := http.NewRequest("GET", "/api/v1/resource/host", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	responseData, _ := io.ReadAll(w.Body)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var hostInfo commondata.HostInfo
+
+	err := json.Unmarshal([]byte(responseData), &hostInfo)
+	if err != nil {
+		t.Errorf("Error decoding hostInfo JSON: %s", err)
+	}
+
+}

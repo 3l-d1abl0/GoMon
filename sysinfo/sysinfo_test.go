@@ -81,3 +81,18 @@ func TestGetCpuInfo(t *testing.T) {
 		t.Errorf("Error decoding cpu.InfoStat JSON: %s", marshallErr)
 	}
 }
+func TestGetHostInfo(t *testing.T) {
+
+	hostInfoData, err := GetHostInfo()
+
+	if err != nil {
+		t.Errorf("Error fetching Host Info: %s", err)
+	}
+
+	var hostInfo commondata.CPUInfo
+	//Check fo valid JSON Structure
+	marshallErr := json.Unmarshal([]byte(fmt.Sprintln(hostInfoData)), &hostInfo)
+	if marshallErr != nil {
+		t.Errorf("Error decoding host.InfoStat JSON: %s", marshallErr)
+	}
+}
