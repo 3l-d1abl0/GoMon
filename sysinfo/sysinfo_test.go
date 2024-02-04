@@ -96,3 +96,18 @@ func TestGetHostInfo(t *testing.T) {
 		t.Errorf("Error decoding host.InfoStat JSON: %s", marshallErr)
 	}
 }
+
+func TestGetLoadInfo(t *testing.T) {
+
+	loadInfoData, err := GetLoadInfo()
+	if err != nil {
+		t.Errorf("Error fetching Load Info: %s", err)
+	}
+
+	var loadInfo commondata.LoadInfo
+	//Check fo valid JSON Structure
+	marshallErr := json.Unmarshal([]byte(fmt.Sprintln(loadInfoData)), &loadInfo)
+	if marshallErr != nil {
+		t.Errorf("Error decoding load.AvgStat JSON: %s", marshallErr)
+	}
+}
